@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material3.Button
@@ -36,6 +38,8 @@ fun PantallaBienvenida(onEntrar: () -> Unit) {
     // R2: Validación nombre
     val esNombreValido = nombreUsuario.length >= 3
 
+    val scrollState = rememberScrollState()
+
     // R4: Estructura con Scaffold y TopAppBar
     Scaffold(
         topBar = {
@@ -48,7 +52,8 @@ fun PantallaBienvenida(onEntrar: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(24.dp),
+                .padding(24.dp)
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
