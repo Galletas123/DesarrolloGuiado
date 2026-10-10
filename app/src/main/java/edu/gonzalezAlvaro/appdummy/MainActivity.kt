@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import edu.gonzalezAlvaro.appdummy.ui.screens.PantallaBienvenida
+import edu.gonzalezAlvaro.appdummy.ui.screens.PantallaGestionPermisos
 import edu.gonzalezAlvaro.appdummy.ui.screens.PantallaListado
 
 class MainActivity : ComponentActivity() {
@@ -25,7 +26,7 @@ class MainActivity : ComponentActivity() {
 //            } else {
 //                PantallaListado()
 //            }
-            PantallaListado()
+            PantallaGestionPermisos()
         }
     }
 }
