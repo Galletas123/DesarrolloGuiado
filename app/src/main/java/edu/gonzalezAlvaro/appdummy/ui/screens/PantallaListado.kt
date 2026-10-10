@@ -1,5 +1,6 @@
 package edu.gonzalezAlvaro.appdummy.ui.screens
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
@@ -20,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import edu.gonzalezAlvaro.appdummy.ui.models.LibroUI
@@ -167,6 +170,9 @@ fun ItemLibro(
     onFavoritoClick: () -> Unit,
     onLeidoClick: () -> Unit
 ) {
+    // R16: Obtener contexto actual para  lanzar Intent implícito
+    val context = LocalContext.current
+
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         modifier = Modifier.fillMaxWidth()
@@ -209,7 +215,8 @@ fun ItemLibro(
             // R7: Dos IconButton cuyos iconos cambian dinámicamente según el estado
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                // R16: Cambio a SpaceAround para acomodar botones uniformemente
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
                 IconButton(onClick = onFavoritoClick) {
                     Icon(
@@ -223,6 +230,22 @@ fun ItemLibro(
                         imageVector = if (libro.leido) Icons.Default.CheckCircle else Icons.Outlined.CheckCircle,
                         contentDescription = "Marcar como leído",
                         tint = if (libro.leido) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                // R16: Botón para compartir el libro
+                IconButton(onClick = {
+                    val sendIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, "¡Mira este libro '${libro.titulo}' de ${libro.autor}!")
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, "Compartir libro")
+                    context.startActivity(shareIntent)
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Compartir libro",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

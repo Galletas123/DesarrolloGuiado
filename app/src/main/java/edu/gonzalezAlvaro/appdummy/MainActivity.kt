@@ -26,7 +26,8 @@ class MainActivity : ComponentActivity() {
 //            } else {
 //                PantallaListado()
 //            }
-            PantallaGestionPermisos()
+            //PantallaGestionPermisos()
+            PantallaListado()
         }
     }
 }
