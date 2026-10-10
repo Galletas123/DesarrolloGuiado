@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import edu.gonzalezAlvaro.appdummy.ui.models.LibroUI
@@ -250,5 +251,27 @@ fun ItemLibro(
                 }
             }
         }
+    }
+}
+
+// R17 Añadido de @Preview
+@Preview(showBackground = true)
+@Composable
+fun PantallaListadoPreview() {
+    MaterialTheme {
+        PantallaListado()
+    }
+}
+
+// R17 Añadido de @Preview
+@Preview(showBackground = true)
+@Composable
+fun ItemLibroPreview() {
+    MaterialTheme {
+        ItemLibro(
+            libro = libros.first(),
+            onFavoritoClick = {},
+            onLeidoClick = {}
+        )
     }
 }

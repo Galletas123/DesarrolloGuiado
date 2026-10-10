@@ -27,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,5 +112,16 @@ fun PantallaBienvenida(onEntrar: () -> Unit) {
                 Text(text = "Entrar")
             }
         }
+    }
+}
+
+// R17 Añadido de @Preview
+@Preview(showBackground = true)
+@Composable
+fun PantallaBienvenidaPreview() {
+    MaterialTheme {
+        PantallaBienvenida(
+            onEntrar = {}
+        )
     }
 }
