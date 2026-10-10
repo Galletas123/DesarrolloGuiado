@@ -1,16 +1,22 @@
 package edu.gonzalezAlvaro.appdummy.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -24,6 +30,23 @@ import edu.gonzalezAlvaro.appdummy.ui.models.libros
 fun PantallaListado() {
     var listaLibros by remember { mutableStateOf(libros) }
 
+    // R8: Estado del campo de búsqueda por título
+    var textoBusqueda by remember { mutableStateOf("") }
+
+    // R9: Estado del filtro por autor seleccionado (null si no hay filtro)
+    var autorSeleccionado by remember { mutableStateOf<String?>(null) }
+
+    val autoresDisponibles = remember { listaLibros.map { it.autor }.distinct() }
+
+    // R9: Combinación reactiva de búsqueda por título y filtro por autor
+    val librosFiltrados = remember(listaLibros, textoBusqueda, autorSeleccionado) {
+        listaLibros.filter { libro ->
+            val coincideTitulo = libro.titulo.contains(textoBusqueda, ignoreCase = true)
+            val coincideAutor = autorSeleccionado == null || libro.autor == autorSeleccionado
+            coincideTitulo && coincideAutor
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -31,30 +54,107 @@ fun PantallaListado() {
             )
         }
     ) { innerPadding ->
-        // R6: LazyVerticalGrid de dos columnas para mostrar la rejilla de libros
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(16.dp)
         ) {
-            items(listaLibros, key = { it.id }) { libro ->
-                ItemLibro(
-                    libro = libro,
-                    onFavoritoClick = {
-                        listaLibros = listaLibros.map {
-                            if (it.id == libro.id) it.copy(esFavorito = !it.esFavorito) else it
-                        }
-                    },
-                    onLeidoClick = {
-                        listaLibros = listaLibros.map {
-                            if (it.id == libro.id) it.copy(leido = !it.leido) else it
+            // R8: Campo de búsqueda con AnimatedVisibility en el botón de borrado
+            OutlinedTextField(
+                value = textoBusqueda,
+                onValueChange = { textoBusqueda = it },
+                label = { Text("Buscar por título...") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    AnimatedVisibility(visible = textoBusqueda.isNotEmpty()) {
+                        IconButton(onClick = { textoBusqueda = "" }) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Limpiar búsqueda",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
                         }
                     }
-                )
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // R9: Filtros por autor mediante FilterChip en una LazyRow horizontal
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                item {
+                    FilterChip(
+                        selected = autorSeleccionado == null,
+                        onClick = { autorSeleccionado = null },
+                        label = { Text("Todos") }
+                    )
+                }
+                items(autoresDisponibles) { autor ->
+                    FilterChip(
+                        selected = autorSeleccionado == autor,
+                        onClick = { autorSeleccionado = if (autorSeleccionado == autor) null else autor },
+                        label = { Text(autor) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // R10: Control de estado vacío si la búsqueda/filtro no arroja resultados
+            if (librosFiltrados.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.Book,
+                            contentDescription = "Sin resultados",
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "No se encontraron libros",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            } else {
+                // R6: LazyVerticalGrid de dos columnas para mostrar la rejilla
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(librosFiltrados, key = { it.id }) { libro ->
+                        ItemLibro(
+                            libro = libro,
+                            onFavoritoClick = {
+                                listaLibros = listaLibros.map {
+                                    if (it.id == libro.id) it.copy(esFavorito = !it.esFavorito) else it
+                                }
+                            },
+                            onLeidoClick = {
+                                listaLibros = listaLibros.map {
+                                    if (it.id == libro.id) it.copy(leido = !it.leido) else it
+                                }
+                            }
+                        )
+                    }
+                }
             }
         }
     }
