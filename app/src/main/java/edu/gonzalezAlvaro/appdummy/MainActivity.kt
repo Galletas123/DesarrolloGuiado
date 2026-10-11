@@ -17,17 +17,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             var mostrarListado by rememberSaveable { mutableStateOf(false) }
 
-//            if (!mostrarListado) {
-//                PantallaBienvenida(
-//                    onEntrar = {
-//                        mostrarListado = true
-//                    }
-//                )
-//            } else {
-//                PantallaListado()
-//            }
-            //PantallaGestionPermisos()
-            PantallaListado()
+            if (!mostrarListado) {
+                PantallaBienvenida(
+                    onEntrar = {
+                        mostrarListado = true
+                    }
+                )
+            } else {
+                PantallaListado()
+                // PantallaGestionPermisos()
+            }
         }
     }
 }
